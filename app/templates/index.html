@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="cap_links">
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+        <a href="{{ url_for('tasks') }}">Tasks</a>
+        <a href="{{ url_for('index') }}">Logout</a>
+    </div>
+    <p>Hello mfucka</p>
+</body>
+</html>
+
+<ul>
+    {% for i in account %}
+    {{ account['fio'], account['dolzhnost'] }}
+    {% endfor %}
+</ul>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <form class="form-register" action="{{ url_for('register') }}" method="post">
+        <label>Login</label>
+        <input type="text" class="form-login" name="login" placeholder="Login" id="login" required>
+        <label>Password</label>
+        <input type="password" class = "form-password" name="password" placeholder="Password" id="password" required>
+        <label>FIO</label>
+        <input type="text" class="form-fio" name="fio" placeholder="FIO" id="fio" required>
+        <label>Role</label>
+        <input type="text" class="form-role" name="role" placeholder="Role" id="role" required>
+        <input type="submit" value="Register" class="form-submit" name="">
+        <a href="{{ url_for('login') }}">If you want to log in, click here</a>
+    </form>
+</body>
+</html>

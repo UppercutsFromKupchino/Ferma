@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Sign In</h1>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+    <form class="form-login" action="{{ url_for('login') }}" method="post">
+        <label>Username</label>
+        <input type="text" class="form-login" name="login" placeholder="Login" id="login" required>
+        <label>Password</label>
+        <input type="password" class = "form-password" name="password" placeholder="Password" id="password" required>
+        <input type="checkbox" value="checked"><b>Remember</b>
+        <input type="submit" value="Login" class="form-submit" name="">
+        <br>
+        <a href="{{ url_for('register') }}">If you want to register, click here</a>
+    </form>
+</body>
+</html>
