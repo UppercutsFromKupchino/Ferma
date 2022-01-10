@@ -1,11 +1,11 @@
 from app import app
-from flask import render_template, flash, redirect, request, session, url_for, g
+from flask import render_template, redirect, request, url_for, g
 import psycopg2
 import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from UserLogin import UserLogin
-from DataBase import DataBase
+from app.UserLogin import UserLogin
+from app.DataBase import DataBase
 
 # Login-manager
 login_manager = LoginManager(app)
@@ -33,7 +33,7 @@ global dbase
 @app.before_request
 def before_request():
     db = get_db()
-    dbase = UserLogin(db)
+    dbase = DataBase(db)
 
 
 @app.teardown_appcontext
