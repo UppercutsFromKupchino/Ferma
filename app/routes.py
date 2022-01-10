@@ -1,88 +1,74 @@
 from app import app
-from flask import render_template, flash, redirect, request, session, url_for
+from flask import render_template, flash, redirect, request, session, url_for, g
 import psycopg2
 import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from UserLogin import UserLogin
-
+from DataBase import DataBase
 
 # Login-manager
 login_manager = LoginManager(app)
-
-# Подключение к СУБД через драйвер psycopg2
-conn = psycopg2.connect(dbname="Kursach_Ferma", user="postgres", password="alp37327", host="localhost")
 
 
 @login_manager.user_loader
 def load_user(user_id):
     print("zbs")
-    return UserLogin().from_db()
+    return UserLogin().from_db(user_id, dbase)
+
+
+# Подключение к СУБД через драйвер psycopg2
+def connect_db():
+    conn = psycopg2.connect(dbname="Kursach_Ferma", user="postgres", password="alp37327", host="localhost")
+    return conn
+
+
+def get_db():
+    if not hasattr(g, 'link_db'):
+        g.link_db = connect_db()
+    return g.link_db
+
+
+global dbase
+@app.before_request
+def before_request():
+    db = get_db()
+    dbase = UserLogin(db)
+
+
+@app.teardown_appcontext
+def close_db(error):
+    if hasattr(g, 'link_db'):
+        g.link_db.close()
 
 
 # Декораторы маршрутов
 @app.route('/')
 def index():
-    # Работа с БД
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute("SELECT ")
-
     return render_template("index.html")
 
 
-@app.route('/login/',  methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
-
+    # Переадресация, если пользователь залогинен
     if current_user.is_authenticated():
         return redirect(url_for('index'))
 
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    if request.method == 'POST' and 'login' in request.form and 'password' in request.form:
+        user = dbase.get_user(request.form['login'])
 
-    if request.method == 'POST':
-        login_in_logform = request.form['login']
-        password = request.form['password']
+        if user and check_password_hash(user['password_of_worker'], request.form['password']):
+            user_login = UserLogin().create(user)
+            rm = True if request.form.get('rememberme') else False
+            login_user(user_login, remember=rm)
 
-        cursor.execute("SELECT * FROM worker WHERE login_of_worker = %s", (login_in_logform,))
-        account = cursor.fetchone()
-        password_rs = account['password_of_worker']
-
-        if account and check_password_hash(password_rs, password):
-            userlogin = UserLogin().create(account)
-            rm = True if request.form.get('checkbox') else False
-            login_user(userlogin, remember=rm)
+            return redirect(url_for('index'))
 
     return render_template('login.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
-
-    if request.method == 'POST':
-        login_in_regform = request.form['login']
-        password = request.form['password']
-        fio = request.form['fio']
-        role = request.form['role']
-
-        _hashed_password = generate_password_hash(password)
-
-        cursor.execute("SELECT * FROM worker WHERE login_of_worker = %s", (login_in_regform,))
-        account = cursor.fetchone()
-
-        cursor.execute("SELECT * FROM roles WHERE name_of_role = %s", (role,))
-        role = cursor.fetchone()
-
-        if account:
-            flash('Account already exists!')
-        else:
-            if role:
-                cursor.execute("INSERT INTO worker(login_of_worker, password_of_worker, fio_of_worker, name_of_role) VALUES (%s,%s,%s,%s)", (login_in_regform, _hashed_password, fio, role))
-                conn.commit()
-                flash('Registration is successful')
-            else:
-                flash('Sosi hui')
-
     return render_template('register.html')
 
 
@@ -99,4 +85,3 @@ def test():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
-
