@@ -15,3 +15,7 @@ class DataBase:
             return False
 
         return result
+
+    def add_user(self, fio, role, login, password):
+        self.__cursor.execute("INSERT INTO worker VALUES (%s,%s,%s,%s)", (fio, role, login, password))
+        self.__db.commit()
