@@ -17,14 +17,12 @@
     {% endif %}
     {% endwith %}
     <form class="form-login" action="{{ url_for('login') }}" method="post">
-        <label>Username</label>
-        <input type="text" class="form-login" name="login" placeholder="Login" id="login" required>
-        <label>Password</label>
-        <input type="password" class = "form-password" name="password" placeholder="Password" id="password" required>
-        <input type="checkbox" value="checked" id="rememberme"><b>Remember</b>
-        <input type="submit" value="Login" class="form-submit" name="">
-        <br>
-        <a href="{{ url_for('register') }}">If you want to register, click here</a>
+        {{ login_form.hidden_tag() }}
+        {{ login_form.login_loginform(size=20) }}{{ login_form.login_loginform.label() }}
+        {{ login_form.password_loginform(size=20) }}{{ login_form.password_loginform.label() }}
+        {{ login_form.remember_loginform() }}{{ login_form.remember_loginform.label() }}
+        {{ login_form.submit_loginform() }}
     </form>
+    <a href="{{ url_for('register') }}">If you want to register, click here</a>
 </body>
 </html>
