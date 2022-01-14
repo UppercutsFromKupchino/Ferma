@@ -22,4 +22,5 @@ class AddingTaskManager(FlaskForm):
     location_addingtaskmanager_form = StringField("Location of task", validators=[DataRequired()])
     typeoftask_addingtaskmanager_form = StringField("Type of task", validators=[DataRequired()])
     comment_addingtaskmanager_form = StringField("Comment")
-    login_addingtaskmeneger_form = SelectField("Login of worker", choices=[])
+    login_addingtaskmanager_form = SelectField("Login of worker", choices=[])
+    submit_addingtaskmanager_form = SubmitField("Add task")

@@ -34,6 +34,9 @@ class DataBase:
         self.__cursor.execute("INSERT INTO purpose(date_of_purpose, login_of_worker) VALUES (%s,%s,%s)", (date_of_purpose, login_of_worker))
         self.__db.commit()
 
-    def get_all_users(self, db):
-        self.__cursor = db.cursor()
-        self.__cursor.execute("SELECT login_of_worker FROM worker WHERE role_of_worker = 'executor'")
+    def get_all_users(self):
+        # self.__cursor = db.cursor()
+        self.__cursor.execute("SELECT login_of_worker FROM worker WHERE name_of_role = 'executor'")
+        workers_executors = self.__cursor.fetchall()
+
+        return workers_executors

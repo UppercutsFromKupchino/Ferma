@@ -7,7 +7,6 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from app.UserLogin import UserLogin
 from app.DataBase import DataBase
 from app.forms import LoginForm, RegisterForm, AddingTaskManager
-import this
 
 
 # Login-manager
@@ -67,16 +66,14 @@ def login():
             print(user)
         else:
             print("user not found")
-
-        if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
-            print("Check is nice")
-
         if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
             print("check zbs")
             user_login = UserLogin().create(user)
             rm = True if login_form.remember_loginform.data else False
             login_user(user_login, remember=rm)
             session['role'] = user['name_of_role']
+            session['login'] = user['login_of_worker']
+            print(session)
             if login_user:
                 print("login zbs")
 
@@ -90,6 +87,9 @@ def register():
     reg_form = RegisterForm()
     # Проверка на валидацию формы
     if reg_form.validate_on_submit():
+
+        _hashed_password = generate_password_hash(reg_form.password_regform.data)
+
         print("validate zbs")
         user = dbase.get_user(reg_form.login_regform.data)
         print(user)
@@ -97,22 +97,26 @@ def register():
             flash("Account already exists")
             redirect(url_for('register'))
         else:
-            dbase.add_user(reg_form.fio_regform.data, reg_form.role_regform.data, reg_form.login_regform.data, reg_form.password_regform.data)
+            dbase.add_user(reg_form.fio_regform.data, reg_form.role_regform.data, reg_form.login_regform.data, _hashed_password)
             print("adding user in table zbs")
+
+            return redirect(url_for('index'))
 
     return render_template('register.html', reg_form=reg_form)
 
 
 @app.route('/tasks')
+@login_required
 def tasks():
-    task_form = AddingTaskManager()
-    task_form.login_addingtaskmeneger_form.choices = [dbase.get_all_users()]
     return render_template("tasks.html")
 
 
-@app.route('/test')
-def test():
-    return render_template("test.html")
+@app.route('/task_adding')
+@login_required
+def task_adding():
+    task_form = AddingTaskManager()
+    task_form.login_addingtaskmanager_form.choices = [dbase.get_all_users()]
+    return render_template("task_adding.html", task_form=task_form)
 
 
 @app.route('/logout')

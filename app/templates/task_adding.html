@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a href="{{ url_for('logout') }}">Logout</a>
+    <h1>Задачи</h1>
+    {% if session['role'] == "manager" %}
+        <label>Задачи</label>
+        <form class="form-adding-task-manager">
+            {{ task_form.location_addingtaskmanager_form(size=20) }}{{ task_form.location_addingtaskmanager_form.label() }}<br>
+            {{ task_form.typeoftask_addingtaskmanager_form(size=20) }}{{ task_form.typeoftask_addingtaskmanager_form.label() }}<br>
+            {{ task_form.comment_addingtaskmanager_form() }}{{ task_form.comment_addingtaskmanager_form.label() }}<br>
+            {{ task_form.login_addingtaskmanager_form() }}<br>
+            {{ task_form.submit_addingtaskmanager_form() }}
+        </form>
+    {% endif %}
+    {% if session['role'] == "executor" %}
+        <p>Ты простой трудяга, у тебя нет прав на просмотр этой страницы</p>
+    {% endif %}
+</body>
+</html>

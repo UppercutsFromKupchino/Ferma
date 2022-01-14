@@ -8,11 +8,15 @@
     <div class="cap_links">
         <a href="{{ url_for('login') }}">Login</a>
         <a href="{{ url_for('register') }}">Register</a>
-        <a href="{{ url_for('tasks') }}">Tasks</a>
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('tasks') }}">Tasks</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
         {% endif %}
     </div>
-    <p>Hello mfucka</p>
+    {% if current_user.is_authenticated %}
+        <p>Hello, {{ session['login'] }}</p>
+    {% else %}
+        <p>You are not logged in</p>
+    {% endif %}
 </body>
 </html>
