@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+from flask import session
 
 
 class DataBase:
@@ -19,3 +20,17 @@ class DataBase:
     def add_user(self, fio, role, login, password):
         self.__cursor.execute("INSERT INTO worker VALUES (%s,%s,%s,%s)", (fio, role, login, password))
         self.__db.commit()
+
+    def get_purpose(self):
+        self.__cursor.execute("SELECT * FROM purpose WHERE login_of_worker = %s", (session['role']))
+        purposes = self.__cursor.fetchall()
+        if not purposes:
+            print("Указаний нет")
+            return False
+
+        return purposes
+
+    def add_purpose(self, date_of_purpose, login_of_worker):
+        self.__cursor.execute("INSERT INTO purpose(date_of_purpose, login_of_worker) VALUES (%s,%s,%s)", (date_of_purpose, login_of_worker))
+        self.__db.commit()
+

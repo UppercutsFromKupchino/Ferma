@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, redirect, request, url_for, g, flash
+from flask import render_template, redirect, request, url_for, g, flash, session
 import psycopg2
 import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -62,6 +62,7 @@ def login():
             user_login = UserLogin().create(user)
             rm = True if request.form.get('rememberme') else False
             login_user(user_login, remember=rm)
+            session['role'] = user['name_of_role']
             if login_user:
                 print("login zbs")
 
@@ -100,7 +101,8 @@ def register():
 
 @app.route('/tasks')
 def tasks():
-    return redirect(url_for('index'))
+
+    return render_template("tasks.html")
 
 
 @app.route('/test')
