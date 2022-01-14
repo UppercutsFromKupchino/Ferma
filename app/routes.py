@@ -6,6 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from app.UserLogin import UserLogin
 from app.DataBase import DataBase
+from app.forms import LoginForm, RegisterForm, AddingTaskManager
+import this
 
 # Login-manager
 login_manager = LoginManager(app)
@@ -20,6 +22,7 @@ def load_user(user_id):
 # Подключение к СУБД через драйвер psycopg2
 def connect_db():
     conn = psycopg2.connect(dbname="Kursach_Ferma", user="postgres", password="alp37327", host="localhost")
+    print("Connection w/ DB zbs")
     return conn
 
 
@@ -50,17 +53,28 @@ def index():
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
+    # Создание экземпляра класса LoginForm
+    login_form = LoginForm()
+
     # Переадресация, если пользователь залогинен
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
-    if request.method == 'POST' and 'login' in request.form and 'password' in request.form:
-        user = dbase.get_user(request.form['login'])
+    if login_form.validate_on_submit():
+        user = dbase.get_user(login_form.login_loginform.data)
+        if user:
+            print(user)
+        else:
+            print("user not found")
 
-        if user and check_password_hash(user['password_of_worker'], request.form['password']):
+        if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
             print("Check is nice")
+
+        if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
+            print("check zbs")
+
             user_login = UserLogin().create(user)
-            rm = True if request.form.get('rememberme') else False
+            rm = True if login_form.remember_loginform.data else False
             login_user(user_login, remember=rm)
             session['role'] = user['name_of_role']
             if login_user:
@@ -68,40 +82,31 @@ def login():
 
             return redirect(url_for('index'))
 
-    return render_template('login.html')
+    return render_template('login.html', login_form=login_form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    # Проверка на отправление POST-запроса
-    if request.method == 'POST':
-        request_login = request.form['login']
-        request_password = request.form['password']
-        request_fio = request.form['fio']
-        request_role = request.form['role']
-
-        hash_password = generate_password_hash(request_password)
-
-        account = dbase.get_user(request.form['login'])
-        print(account)
-
-        # Проверка на наличие аккаунта с таким же логином
-        if account:
-            flash("Аккаунт с таким логином уже существует")
-        # Добавление значений в базу данных
+    reg_form = RegisterForm()
+    # Проверка на валидацию формы
+    if reg_form.validate_on_submit():
+        print("validate zbs")
+        user = dbase.get_user(reg_form.login_regform.data)
+        print(user)
+        if user:
+            flash("Account already exists")
+            redirect(url_for('register'))
         else:
-            dbase.add_user(request_fio, request_role, request_login, hash_password)
-            print("Добавление успешно")
+            dbase.add_user(reg_form.fio_regform.data, reg_form.role_regform.data, reg_form.login_regform.data, reg_form.password_regform.data)
+            print("adding user in table zbs")
 
-            # Перенаправление на страницу авторизации
-            return redirect(url_for('login'))
-
-    return render_template('register.html')
+    return render_template('register.html', reg_form=reg_form)
 
 
 @app.route('/tasks')
 def tasks():
-
+    task_form = AddingTaskManager()
+    task_form.login_addingtaskmeneger_form.choices = [dbase.get_all_users()]
     return render_template("tasks.html")
 
 
@@ -115,4 +120,6 @@ def test():
 def logout():
     logout_user()
     flash("Вы вышли из аккаунта", "success")
+    print("logout zbs")
+
     return redirect(url_for('index'))

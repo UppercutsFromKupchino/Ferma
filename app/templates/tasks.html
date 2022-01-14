@@ -8,8 +8,10 @@
     <a href="{{ url_for('logout') }}">Logout</a>
     <h1>Задачи</h1>
     {% if session['role'] == "manager" %}
-        <label>Text</label>
-        <input type>
+        <label>Задачи</label>
+        <form class="form-adding-task-manager">
+
+        </form>
     {% endif %}
 </body>
 </html>

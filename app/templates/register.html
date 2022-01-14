@@ -7,16 +7,13 @@
 <body>
     <h1>Register</h1>
     <form class="form-register" action="{{ url_for('register') }}" method="post">
-        <label>Login</label>
-        <input type="text" class="form-login" name="login" placeholder="Login" id="login" required>
-        <label>Password</label>
-        <input type="password" class = "form-password" name="password" placeholder="Password" id="password" required>
-        <label>FIO</label>
-        <input type="text" class="form-fio" name="fio" placeholder="FIO" id="fio" required>
-        <label>Role</label>
-        <input type="text" class="form-role" name="role" placeholder="Role" id="role" required>
-        <input type="submit" value="Register" class="form-submit" name="">
-        <a href="{{ url_for('login') }}">If you want to log in, click here</a>
+        {{ reg_form.hidden_tag() }}
+        {{ reg_form.login_regform(size=20) }}{{ reg_form.login_regform.label() }}<br>
+        {{ reg_form.password_regform(size=20) }}{{ reg_form.password_regform.label }}<br>
+        {{ reg_form.fio_regform(size=20) }}{{ reg_form.fio_regform.label }}<br>
+        {{ reg_form.role_regform(size=20) }}{{ reg_form.role_regform.label }}<br>
+        {{ reg_form.submit_regform() }}
     </form>
+    <a href="{{ url_for('login') }}">If you want to log in, click here</a>
 </body>
 </html>
