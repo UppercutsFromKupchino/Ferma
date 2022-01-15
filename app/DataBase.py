@@ -67,3 +67,6 @@ class DataBase:
         # Добавляю в таблицу purpose
         self.__cursor.execute("INSERT INTO purpose VALUES (%s,%s,%s)", (datetime, max_id_of_task, login))
         self.__db.commit()
+
+    def show_tasks(self):
+        self.__cursor.execute("SELECT ")

@@ -8,7 +8,23 @@
     <a href="{{ url_for('logout') }}">Logout</a>
     {% if session['role'] == 'manager' %}
         <a href="{{ url_for('task_adding') }}">Add task</a>
+        {% if table_info != None %}
+            <tbody>
+            {% for counter in range(table_info_len) %}
+            <tr>
+                <td>{{ table_info[counter][0] }}</td>
+                <td>{{ table_info[counter][1] }}</td>
+                <td>{{ table_info[counter][2] }}</td>
+                <td>{{ table_info[counter][3] }}</td>
+                <td>{{ table_info[counter][4] }}</td>
+                <td>{{ table_info[counter][5] }}</td>
+                <td>{{ table_info[counter][6] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        {% endif %}
     {% endif %}
-    <h1>Задачи</h1>
+    {% if session['role'] == 'executor' %}
+    {% endif %}
 </body>
 </html>
