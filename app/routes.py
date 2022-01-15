@@ -6,7 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from app.UserLogin import UserLogin
 from app.DataBase import DataBase
-from app.forms import LoginForm, RegisterForm, AddingTaskManager
+from app.forms import LoginForm, RegisterForm
+import datetime
 
 
 # Login-manager
@@ -15,14 +16,12 @@ login_manager = LoginManager(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    print("login_manager zbs")
     return UserLogin().from_db(user_id, dbase)
 
 
 # Подключение к СУБД через драйвер psycopg2
 def connect_db():
     conn = psycopg2.connect(dbname="Kursach_Ferma", user="postgres", password="alp37327", host="localhost")
-    print("Connection w/ DB zbs")
     return conn
 
 
@@ -62,20 +61,12 @@ def login():
 
     if login_form.validate_on_submit():
         user = dbase.get_user(login_form.login_loginform.data)
-        if user:
-            print(user)
-        else:
-            print("user not found")
         if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
-            print("check zbs")
             user_login = UserLogin().create(user)
             rm = True if login_form.remember_loginform.data else False
             login_user(user_login, remember=rm)
             session['role'] = user['name_of_role']
             session['login'] = user['login_of_worker']
-            print(session)
-            if login_user:
-                print("login zbs")
 
             return redirect(url_for('index'))
 
@@ -88,17 +79,15 @@ def register():
     # Проверка на валидацию формы
     if reg_form.validate_on_submit():
 
+        # Хэширование пароля
         _hashed_password = generate_password_hash(reg_form.password_regform.data)
 
-        print("validate zbs")
         user = dbase.get_user(reg_form.login_regform.data)
-        print(user)
         if user:
             flash("Account already exists")
             redirect(url_for('register'))
         else:
             dbase.add_user(reg_form.fio_regform.data, reg_form.role_regform.data, reg_form.login_regform.data, _hashed_password)
-            print("adding user in table zbs")
 
             return redirect(url_for('index'))
 
@@ -111,12 +100,51 @@ def tasks():
     return render_template("tasks.html")
 
 
-@app.route('/task_adding')
+@app.route('/task_adding', methods=['GET', 'POST'])
 @login_required
 def task_adding():
-    task_form = AddingTaskManager()
-    task_form.login_addingtaskmanager_form.choices = [dbase.get_all_users()]
-    return render_template("task_adding.html", task_form=task_form)
+    # Получаю всех работников с ролью "рабочий"
+    executors_select = dbase.get_all_users()
+    executors_select_len = len(executors_select)
+    executors_select_dict = {}
+    for i in range(executors_select_len):
+        executors_select_dict[i+1] = executors_select[i][0]
+
+    # Получаю все локации из базы данных
+    locations_select = dbase.get_all_locations()
+    locations_select_len = len(locations_select)
+    locations_select_dict = {}
+    for i in range(locations_select_len):
+        locations_select_dict[i+1] = locations_select[i][0]
+
+    # Получаю все типы задач из базы данных
+    typeoftask_select = dbase.get_all_types()
+    typeoftask_select_len = len(typeoftask_select)
+    typeoftask_select_dict = {}
+    for i in range(typeoftask_select_len):
+        typeoftask_select_dict[i + 1] = typeoftask_select[i][0]
+
+    # Добавляю задачу
+    if request.method == 'POST':
+        select_login = request.form['select-login']
+        select_login_value = executors_select_dict[int(select_login)]
+
+        select_location = request.form['select-location']
+        select_location_value = locations_select_dict[int(select_location)]
+
+        select_typeoftask = request.form['select-typeoftask']
+        select_typeoftask_value = typeoftask_select_dict[int(select_typeoftask)]
+
+        current_datetime_addingtask = datetime.datetime.now()
+
+        # Конкатенация локации и типа
+        adding_location_plus_typeoftask = select_typeoftask_value + " in " + select_location_value
+
+        # Взаимодействие с БД
+        dbase.adding_task_form(select_login_value, adding_location_plus_typeoftask, select_location, select_typeoftask, current_datetime_addingtask)
+
+    return render_template("task_adding.html", executors_select_dict=executors_select_dict,
+                           locations_select_dict=locations_select_dict, typeoftask_select_dict=typeoftask_select_dict)
 
 
 @app.route('/logout')
@@ -124,6 +152,5 @@ def task_adding():
 def logout():
     logout_user()
     flash("Вы вышли из аккаунта", "success")
-    print("logout zbs")
 
     return redirect(url_for('index'))

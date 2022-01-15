@@ -12,7 +12,6 @@ class DataBase:
         self.__cursor.execute(f"SELECT * FROM worker WHERE login_of_worker = '{login}' ")
         result = self.__cursor.fetchone()
         if not result:
-            print("Пользователь не найден")
             return False
 
         return result
@@ -25,7 +24,6 @@ class DataBase:
         self.__cursor.execute("SELECT * FROM purpose WHERE login_of_worker = %s", (session['role']))
         purposes = self.__cursor.fetchall()
         if not purposes:
-            print("Указаний нет")
             return False
 
         return purposes
@@ -35,8 +33,37 @@ class DataBase:
         self.__db.commit()
 
     def get_all_users(self):
-        # self.__cursor = db.cursor()
+        self.__cursor = self.__db.cursor()
         self.__cursor.execute("SELECT login_of_worker FROM worker WHERE name_of_role = 'executor'")
         workers_executors = self.__cursor.fetchall()
 
         return workers_executors
+
+    def get_all_locations(self):
+        self.__cursor = self.__db.cursor()
+        self.__cursor.execute("SELECT name_of_location FROM location_of_task")
+        locations = self.__cursor.fetchall()
+
+        return locations
+
+    def get_all_types(self):
+        self.__cursor = self.__db.cursor()
+        self.__cursor.execute("SELECT type_of_task_ FROM type_of_task")
+        types_of_task = self.__cursor.fetchall()
+
+        return types_of_task
+
+    def adding_task_form(self, login, text, location, typeoftask, datetime):
+        # Добавляю в таблицу task
+        self.__cursor.execute(
+            "INSERT INTO task(text_of_task,id_of_location,id_of_type,id_of_status) VALUES(%s,%s,%s,'1')",
+            (text, location, typeoftask))
+        self.__db.commit()
+
+        # Ищу максимальное значение id в таблице task
+        self.__cursor.execute("SELECT MAX(id_of_task) FROM task")
+        max_id_of_task = self.__cursor.fetchone()
+
+        # Добавляю в таблицу purpose
+        self.__cursor.execute("INSERT INTO purpose VALUES (%s,%s,%s)", (datetime, max_id_of_task, login))
+        self.__db.commit()

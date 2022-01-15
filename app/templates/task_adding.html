@@ -6,15 +6,37 @@
 </head>
 <body>
     <a href="{{ url_for('logout') }}">Logout</a>
-    <h1>Задачи</h1>
     {% if session['role'] == "manager" %}
-        <label>Задачи</label>
-        <form class="form-adding-task-manager">
-            {{ task_form.location_addingtaskmanager_form(size=20) }}{{ task_form.location_addingtaskmanager_form.label() }}<br>
-            {{ task_form.typeoftask_addingtaskmanager_form(size=20) }}{{ task_form.typeoftask_addingtaskmanager_form.label() }}<br>
-            {{ task_form.comment_addingtaskmanager_form() }}{{ task_form.comment_addingtaskmanager_form.label() }}<br>
-            {{ task_form.login_addingtaskmanager_form() }}<br>
-            {{ task_form.submit_addingtaskmanager_form() }}
+        <h3>Добавить задачу</h3>
+        <form class="form-adding-task-manager" action="{{ url_for('task_adding') }}" method="post">
+            <div>
+                <p>Выберите логин</p>
+                <select name="select-login">
+                    <option value="0">-null-</option>
+                    {% for key, value in executors_select_dict.items() %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <p>Выберите локацию</p>
+                <select name="select-location">
+                    <option value="0">-null-</option>
+                    {% for key, value in locations_select_dict.items() %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+            <p>Выберите тип задания</p>
+                <select name="select-typeoftask">
+                    <option value="0">-null-</option>
+                    {% for key, value in typeoftask_select_dict.items() %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="submit" value="Добавить задачу">
         </form>
     {% endif %}
     {% if session['role'] == "executor" %}

@@ -15,4 +15,4 @@ class UserLogin(UserMixin):
         return self
 
     def get_id(self):
-        return str(self.__user['login_of_worker'])
+        return str(self.__user['id_of_worker'])
