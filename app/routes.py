@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, redirect, request, url_for, g
+from flask import render_template, redirect, request, url_for, g, session
 import psycopg2
 import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -71,6 +71,7 @@ def login():
             user_login = UserLogin().create(user)
             rm = True if request.form.get('rememberme') else False
             login_user(user_login, remember=rm)
+            session['role'] = user['role_of_worker']
 
             return redirect(url_for('index'))
 
@@ -79,10 +80,17 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+    reg_form = RegisterForm()
+    # Проверка валидации формы
+    if reg_form.validate_on_submit():
+        _hashed_password = generate_password_hash(reg_form.password_regform.data)
+        dbase.add_user(reg_form.fio_regform.data, reg_form.role_regform.data, reg_form.login_regform.data, _hashed_password)
+
+    return render_template('register.html', reg_form=reg_form)
 
 
 @app.route('/tasks')
+@login_required
 def tasks():
     return redirect(url_for('index'))
 

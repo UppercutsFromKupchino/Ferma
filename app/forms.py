@@ -15,3 +15,4 @@ class RegisterForm(FlaskForm):
     password_regform = PasswordField("Password", validators=[DataRequired()])
     role_regform = StringField("Role", validators=[DataRequired()])
     fio_regform = StringField("FIO", validators=[DataRequired()])
+    submit_regform = SubmitField("Register", validators=[DataRequired()])

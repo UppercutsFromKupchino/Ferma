@@ -7,5 +7,12 @@
 <body>
     <a href="{{ url_for('index') }}">Logout</a>
     <h1>Задачи</h1>
+    {% if current_user.is_authenticated %}
+        <form>
+        {{ form.hidden_tag() }}
+        {{  }}
+        </form>
+    {% else %}
+    {% endif %}
 </body>
 </html>
