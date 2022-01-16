@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a href="{{ url_for('logout') }}">Logout</a>
+    {% if session['role'] == "manager" %}
+        <h3>Добавить задачу</h3>
+        <form class="form-adding-task-manager" action="{{ url_for('task_adding') }}" method="post">
+            <div>
+                <p>Выберите логин</p>
+                <select name="select-login">
+                    <option value="0">-null-</option>
+                    {% for key, value in executors_select_dict.items() %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <p>Выберите локацию</p>
+                <select name="select-location">
+                    <option value="0">-null-</option>
+                    {% for key, value in locations_select_dict.items() %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+            <p>Выберите тип задания</p>
+                <select name="select-typeoftask">
+                    <option value="0">-null-</option>
+                    {% for key, value in typeoftask_select_dict.items() %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="submit" value="Добавить задачу">
+        </form>
+    {% endif %}
+    {% if session['role'] == "executor" %}
+        <p>Ты простой трудяга, у тебя нет прав на просмотр этой страницы</p>
+    {% endif %}
+</body>
+</html>

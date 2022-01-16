@@ -5,7 +5,10 @@
     <title>Title</title>
 </head>
 <body>
-    <a href="{{ url_for('index') }}">Logout</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+    {% if session['role'] == 'manager' %}
+        <a href="{{ url_for('task_adding') }}">Add task</a>
+    {% endif %}
     <h1>Задачи</h1>
     {% if current_user.is_authenticated %}
         <form>

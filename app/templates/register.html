@@ -12,6 +12,8 @@
         {{ reg_form.password_regform(size=20) }}{{ reg_form.password_regform.label }}<br>
         {{ reg_form.fio_regform(size=20) }}{{ reg_form.fio_regform.label() }}<br>
         {{ reg_form.role_regform(size=20) }}{{ reg_form.role_regform.label() }}<br>
+        {{ reg_form.fio_regform(size=20) }}{{ reg_form.fio_regform.label }}<br>
+        {{ reg_form.role_regform(size=20) }}{{ reg_form.role_regform.label }}<br>
         {{ reg_form.submit_regform() }}
     </form>
     <a href="{{ url_for('login') }}">If you want to log in, click here</a>
