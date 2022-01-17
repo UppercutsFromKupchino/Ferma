@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+import psycopg2.errors
 from flask import session
 
 
@@ -53,20 +54,30 @@ class DataBase:
 
         return types_of_task
 
-    def adding_task_form(self, login, text, location, typeoftask, datetime):
-        # Добавляю в таблицу task
-        self.__cursor.execute(
-            "INSERT INTO task(text_of_task,id_of_location,id_of_type,id_of_status) VALUES(%s,%s,%s,'1')",
-            (text, location, typeoftask))
-        self.__db.commit()
+    def adding_task_form(self, login, text, location, typeoftask, datetime, comment):
+        try:
+            # Добавляю в таблицу task
+            self.__cursor.execute(
+                "INSERT INTO task(text_of_task,id_of_location,id_of_type,id_of_status) VALUES(%s,%s,%s,'1')",
+                (text, location, typeoftask))
+            self.__db.commit()
 
-        # Ищу максимальное значение id в таблице task
-        self.__cursor.execute("SELECT MAX(id_of_task) FROM task")
-        max_id_of_task = self.__cursor.fetchone()
+            # Ищу максимальное значение id в таблице task
+            self.__cursor.execute("SELECT MAX(id_of_task) FROM task")
+            max_id_of_task = self.__cursor.fetchone()
+            if not max_id_of_task:
+                max_id_of_task = 1
 
-        # Добавляю в таблицу purpose
-        self.__cursor.execute("INSERT INTO purpose VALUES (%s,%s,%s)", (datetime, max_id_of_task, login))
-        self.__db.commit()
+            # Добавляю в таблицу purpose
+            self.__cursor.execute("INSERT INTO purpose VALUES (%s,%s,%s)", (datetime, max_id_of_task, login))
+            self.__db.commit()
+
+            # Добавляю в таблицу comment
+            self.__cursor.execute("INSERT INTO comment_to_task(text_of_comment,datetime_of_comment,id_of_task,login_of_worker) VALUES (%s,%s,%s,%s)",
+                                  (comment, datetime, max_id_of_task, login))
+            self.__db.commit()
+        except:
+            self.__db.rollback()
 
     def show_tasks(self):
         self.__cursor.execute("SELECT ")

@@ -126,22 +126,29 @@ def task_adding():
 
     # Добавляю задачу
     if request.method == 'POST':
+        # Получаю значение логина из формы
         select_login = request.form['select-login']
         select_login_value = executors_select_dict[int(select_login)]
 
+        # Получаю значение локации из формы
         select_location = request.form['select-location']
         select_location_value = locations_select_dict[int(select_location)]
 
+        # Получаю значение типа задачи из формы
         select_typeoftask = request.form['select-typeoftask']
         select_typeoftask_value = typeoftask_select_dict[int(select_typeoftask)]
 
+        # Получаю текст комментария
+        input_comment = request.form['input-comment']
+
+        # Получаю значение даты/времени
         current_datetime_addingtask = datetime.datetime.now()
 
         # Конкатенация локации и типа
         adding_location_plus_typeoftask = select_typeoftask_value + " in " + select_location_value
 
         # Взаимодействие с БД
-        dbase.adding_task_form(select_login_value, adding_location_plus_typeoftask, select_location, select_typeoftask, current_datetime_addingtask)
+        dbase.adding_task_form(select_login_value, adding_location_plus_typeoftask, select_location, select_typeoftask, current_datetime_addingtask, input_comment)
 
     return render_template("task_adding.html", executors_select_dict=executors_select_dict,
                            locations_select_dict=locations_select_dict, typeoftask_select_dict=typeoftask_select_dict)
@@ -154,3 +161,12 @@ def logout():
     flash("Вы вышли из аккаунта", "success")
 
     return redirect(url_for('index'))
+
+
+
+if basket_form.submit_add_basketform.data:
+    basket = []
+    basket_form_each = []
+    basket_form_each.append(basket_form.dish_basketform.data)
+    basket_form_each.append(basket_form.kol_basketform.data)
+    basket.append(basket_form_each)
