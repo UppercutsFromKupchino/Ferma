@@ -14,12 +14,9 @@
         {% endif %}
     </div>
     {% if current_user.is_authenticated %}
-    <p>Hello, {{ current_user.username }}</p>
+    <p>Hello, {{ login }}</p>
     {% else %}
-    <p>ti ne zaloginen, sooka</p>
-        <p>Hello, {{ session['login'] }}</p>
-    {% else %}
-        <p>You are not logged in</p>
+    <p>You are not logged in!! This site contains private 18+ information, get the hell outta here if you don't work with us</p>
     {% endif %}
 </body>
 </html>
