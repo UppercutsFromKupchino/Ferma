@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Tasks</title>
 </head>
 <body>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    {% if session['role'] == 'manager' %}
+    <div class="cap_links">
+        <a href="{{ url_for('logout') }}" class="redirect-tasks-logout">Logout</a>
+        <a href="{{ url_for('index') }}" class="redirect-tasks-home">Home page</a>
+    </div>
+    {% if session.get('role') == "manager" %}
         <a href="{{ url_for('task_adding') }}">Add task</a>
         {% if table_info != None %}
             <tbody>
@@ -25,6 +28,48 @@
         {% endif %}
     {% endif %}
     {% if session['role'] == 'executor' %}
+        <table class="table table-hover table-info table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Задание</th>
+                    <th scope="col">Комментарий</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Логин работника</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for i in range(tasks_manager_i_len) %}
+                <tr>
+                    <td>{{ tasks_manager[i][0] }}</td>
+                    <td>{{ tasks_manager[i][1] }}</td>
+                    <td>{{ tasks_manager[i][2] }}</td>
+                    <td>{{ tasks_manager[i][3] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if session.get('role') == "executor" %}
+        <table class="table table-hover table-info table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Задание</th>
+                    <th scope="col">Комментарий</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Дата и время</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for i in range(tasks_executor_i_len) %}
+                <tr>
+                    <td>{{ tasks_executor[i][0] }}</td>
+                    <td>{{ tasks_executor[i][1] }}</td>
+                    <td>{{ tasks_executor[i][2] }}</td>
+                    <td>{{ tasks_executor[i][3] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     {% endif %}
 </body>
 </html>

@@ -1,0 +1,63 @@
+.html{
+    background: #481CA6
+}
+
+.cap_links{
+    background: #0BD953;
+    border-radius: 10px;
+    height: 100px;
+}
+
+.redirect-home-login{
+    color: aliceblue;
+    font-size: 24px;
+    margin-right: 8.5%;
+    margin-left: 8.5%;
+    position: relative;
+    top: 35px;
+    background: #17590C;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.redirect-home-register{
+    color: aliceblue;
+    font-size: 24px;
+    margin-right: 8.5%;
+    margin-left: 8.5%;
+    position: relative;
+    top: 35px;
+    background: #17590C;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.redirect-home-tasks{
+    color: aliceblue;
+    font-size: 24px;
+    margin-right: 8.5%;
+    margin-left: 8.5%;
+    position: relative;
+    top: 35px;
+    background: #17590C;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.redirect-home-logout{
+    color: aliceblue;
+    font-size: 24px;
+    margin-right: 8.5%;
+    margin-left: 8.5%;
+    position: relative;
+    top: 35px;
+    background: #17590C;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.paragraph-index{
+    color: aliceblue;
+    font-size: 40px;
+    text-align: center;
+}

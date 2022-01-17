@@ -1,0 +1,64 @@
+.html{
+    background: #481CA6
+}
+
+.cap_links{
+    background: #0BD953;
+    border-radius: 10px;
+    height: 100px;
+}
+
+.redirect-login-home{
+    color: aliceblue;
+    font-size: 24px;
+    margin-left: 47%;
+    position: relative;
+    top: 35px;
+    background: #17590C;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.center-div {
+    width: 304px;
+    height: 212px;
+    background: #17590C;
+    border-radius: 10px;
+    margin-left: 42%;
+    margin-top: 10%;
+    margin-bottom: 24px;
+}
+
+.h3-sign-in{
+    text-align: center;
+    color: aliceblue;
+    position: relative;
+    top:3px;
+}
+
+.login-form-login {
+    margin-left: 64px;
+    margin-bottom: 15px;
+    border-radius: 7px;
+    height: 25px;
+}
+
+.password-form-login {
+    margin-left: 64px;
+    margin-bottom: 15px;
+    border-radius: 7px;
+    height: 25px;
+}
+
+.submit-form-login {
+    margin-left: 111px;
+    margin-top: 8px;
+    border-radius: 7px;
+    height: 39px;
+    width: 74px;
+}
+
+.redirect-login-register {
+    color: aliceblue;
+    margin-left: 45%;
+}

@@ -11,15 +11,19 @@ class DataBase:
 
     def get_user(self, login):
         self.__cursor.execute(f"SELECT * FROM worker WHERE login_of_worker = '{login}' ")
-        result = self.__cursor.fetchone()
-        if not result:
+        user = self.__cursor.fetchone()
+        if not user:
             return False
 
-        return result
+        return user
 
     def add_user(self, fio, role, login, password):
-        self.__cursor.execute("INSERT INTO worker VALUES (%s,%s,%s,%s)", (fio, role, login, password))
+        self.__cursor.execute("INSERT INTO worker VALUES (%s,%s,%s,%s)", (login, password, fio, role))
         self.__db.commit()
+
+    # def add_task(self):
+    #     self.__cursor.execute("INSERT INTO worker VALUES (%s,%s,%s,%s)", (fio, role, login, password))
+    #     self.__db.commit()
 
     def get_purpose(self):
         self.__cursor.execute("SELECT * FROM purpose WHERE login_of_worker = %s", (session['role']))
@@ -35,21 +39,21 @@ class DataBase:
 
     def get_all_users(self):
         self.__cursor = self.__db.cursor()
-        self.__cursor.execute("SELECT login_of_worker FROM worker WHERE name_of_role = 'executor'")
+        self.__cursor.execute("SELECT login_of_worker FROM worker WHERE role_of_worker = 'executor'")
         workers_executors = self.__cursor.fetchall()
 
         return workers_executors
 
     def get_all_locations(self):
         self.__cursor = self.__db.cursor()
-        self.__cursor.execute("SELECT name_of_location FROM location_of_task")
+        self.__cursor.execute("SELECT name_of_location FROM locations")
         locations = self.__cursor.fetchall()
 
         return locations
 
     def get_all_types(self):
         self.__cursor = self.__db.cursor()
-        self.__cursor.execute("SELECT type_of_task_ FROM type_of_task")
+        self.__cursor.execute("SELECT name_of_type FROM type_of_task")
         types_of_task = self.__cursor.fetchall()
 
         return types_of_task
@@ -81,3 +85,44 @@ class DataBase:
 
     def show_tasks(self):
         self.__cursor.execute("SELECT ")
+        # Добавляю в таблицу task
+        self.__cursor.execute(
+            "INSERT INTO task(text_of_task,id_of_location,id_of_type,id_of_status) VALUES(%s,%s,%s,'1')",
+            (text, location, typeoftask))
+
+        # Ищу максимальное значение id в таблице task
+        self.__cursor.execute("SELECT MAX(id_of_task) FROM task")
+        max_id_of_task = self.__cursor.fetchone()
+
+        # Добавляю в таблицу purpose
+        self.__cursor.execute("""INSERT INTO purpose(datetime_of_purpose,id_of_task,login_of_worker) VALUES (%s,%s,%s)"""
+                              , (datetime, max_id_of_task, login))
+
+        # Добавляю в таблицу comment
+        self.__cursor.execute("""INSERT INTO comment_to_task(text_of_comment,date_of_comment,id_of_task,login_of_worker)
+        VALUES (%s,%s,%s,%s)""", (comment, datetime, max_id_of_task, login))
+
+        # Коммит изменений в базу данных
+        self.__db.commit()
+
+    def get_tasks_manager(self):
+        self.__cursor = self.__db.cursor()
+        self.__cursor.execute("""SELECT text_of_task,text_of_comment,name_of_status,purpose.login_of_worker
+        FROM task JOIN status ON task.id_of_status=status.id_of_status JOIN comment_to_task ON task.id_of_task=comment_to_task.id_of_task
+		JOIN purpose ON task.id_of_task=purpose.id_of_task""")
+        tasks_manager = self.__cursor.fetchall()
+        print("manager")
+
+        return tasks_manager
+
+    def get_tasks_executor(self,login):
+        self.__cursor = self.__db.cursor()
+        self.__cursor.execute("""SELECT text_of_task,text_of_comment,name_of_status,datetime_of_purpose FROM task
+                                JOIN comment_to_task ON task.id_of_task=comment_to_task.id_of_task
+                                JOIN status ON task.id_of_status=status.id_of_status
+                                JOIN purpose ON task.id_of_task=purpose.id_of_task WHERE purpose.login_of_worker = %s""",
+                              (login,))
+        tasks_executor = self.__cursor.fetchall()
+        print("executor")
+
+        return tasks_executor

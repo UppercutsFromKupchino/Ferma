@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="html">
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 </head>
 <body>
-    <h1>Sign In</h1>
-    <hr>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
+    <div class="cap_links">
+        <a href="{{ url_for('index') }}" class="redirect-login-home">Home page</a>
+    </div>
+    <div class="center-div">
+        <h3 class="h3-sign-in">Sign In</h3>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
         <ul>
             {% for message in messages %}
             <li>{{ message }}</li>
@@ -24,5 +29,15 @@
         {{ login_form.submit_loginform() }}
     </form>
     <a href="{{ url_for('register') }}">If you want to register, click here</a>
+        {% endif %}
+        {% endwith %}
+        <form class="form-login" action="{{ url_for('login') }}" method="post">
+            {{ login_form.hidden_tag() }}
+            {{ login_form.login_loginform(placeholder="Login", class_="login-form-login") }}<br>
+            {{ login_form.password_loginform(placeholder="Password", class_="password-form-login") }}<br>
+            {{ login_form.submit_loginform(class_="submit-form-login") }}<br>
+        </form>
+    </div>
+    <a href="{{ url_for('register') }}" class="redirect-login-register">If you want to register, click here</a>
 </body>
 </html>
