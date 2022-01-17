@@ -11,10 +11,10 @@ from app.forms import LoginForm, RegisterForm
 import datetime
 
 
-# Login-manager
+# инициализация менеджера логинов
 login_manager = LoginManager(app)
 
-
+# Login-manager
 @login_manager.user_loader
 def load_user(user_id):
     return UserLogin().from_db(user_id, dbase)
@@ -31,14 +31,14 @@ def get_db():
         g.link_db = connect_db()
     return g.link_db
 
-
+# Создание объекта для работы с бд
 @app.before_request
 def before_request():
     db = get_db()
     global dbase
     dbase = DataBase(db)
 
-
+# Закрытие работы с базой данных
 @app.teardown_appcontext
 def close_db(error):
     if hasattr(g, 'link_db'):
@@ -48,29 +48,32 @@ def close_db(error):
 # Декораторы маршрутов
 @app.route('/')
 def index():
-    if session['login']:
-        login = session['login']
-    print(session['role'])
-    return render_template("index.html", login=login)
+    if current_user.is_authenticated:
+        login_user = session['login']
+        print(session['login'])
+    return render_template("index.html", login_user=login_user)
 
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     # Создание экземпляра класса LoginForm
     login_form = LoginForm()
-
     # Переадресация, если пользователь залогинен
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-
+    # Проверка валидации формы, введённой на сайте
     if login_form.validate_on_submit():
+        # Проверяю, существует ли в базе данных пользователь с логином, введённым в форме
         user = dbase.get_user(login_form.login_loginform.data)
+        print(user)
+        # Проверка пароля; пароль хранится в виде хэша в целях безопасности
         if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
+            # Авторизация пользователя
             user_login = UserLogin().create(user)
-            rm = True if login_form.remember_loginform.data else False
-            login_user(user_login, remember=rm)
-            session['role'] = user['role_of_worker']
-            session['login'] = user['login_of_worker']
+            login_user(user_login)
+            session['role'] = user[1]
+            session['login'] = user[2]
+            print(session['login'])
 
             return redirect(url_for('index'))
 
