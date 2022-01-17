@@ -50,6 +50,7 @@ def close_db(error):
 def index():
     if session['login']:
         login = session['login']
+    print(session['role'])
     return render_template("index.html", login=login)
 
 
@@ -106,14 +107,18 @@ def register():
 @app.route('/tasks')
 @login_required
 def tasks():
-    if session['role'] == "executor":
-        redirect(url_for('index'))
-    tasks_manager = dbase.get_tasks()
-    for i in tasks_manager:
-        tasks_manager_i_len = len(tasks_manager)
-    print(tasks_manager_i_len)
+    if session['role'] == 'executor':
+        tasks_executor = dbase.get_tasks_executor(session['login'])
+        tasks_executor_i_len = len(tasks_executor)
+        print(tasks_executor_i_len)
 
-    return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager)
+        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len,tasks_executor=tasks_executor)
+    elif session['role'] == 'manager':
+        tasks_manager = dbase.get_tasks_manager()
+        tasks_manager_i_len = len(tasks_manager)
+        print(tasks_manager_i_len)
+
+        return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager)
 
 
 @app.route('/task_adding', methods=['GET', 'POST'])

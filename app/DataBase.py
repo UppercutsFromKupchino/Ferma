@@ -78,11 +78,24 @@ class DataBase:
         # Коммит изменений в базу данных
         self.__db.commit()
 
-    def get_tasks(self):
+    def get_tasks_manager(self):
         self.__cursor = self.__db.cursor()
         self.__cursor.execute("""SELECT text_of_task,text_of_comment,name_of_status,purpose.login_of_worker
         FROM task JOIN status ON task.id_of_status=status.id_of_status JOIN comment_to_task ON task.id_of_task=comment_to_task.id_of_task
 		JOIN purpose ON task.id_of_task=purpose.id_of_task""")
         tasks_manager = self.__cursor.fetchall()
+        print("manager")
 
         return tasks_manager
+
+    def get_tasks_executor(self,login):
+        self.__cursor = self.__db.cursor()
+        self.__cursor.execute("""SELECT text_of_task,text_of_comment,name_of_status,datetime_of_purpose FROM task
+                                JOIN comment_to_task ON task.id_of_task=comment_to_task.id_of_task
+                                JOIN status ON task.id_of_status=status.id_of_status
+                                JOIN purpose ON task.id_of_task=purpose.id_of_task WHERE purpose.login_of_worker = %s""",
+                              (login,))
+        tasks_executor = self.__cursor.fetchall()
+        print("executor")
+
+        return tasks_executor
