@@ -81,11 +81,6 @@ def login():
 def register():
     reg_form = RegisterForm()
 
-    # Проверка валидации формы
-    if reg_form.validate_on_submit():
-        _hashed_password = generate_password_hash(reg_form.password_regform.data)
-        dbase.add_user(reg_form.fio_regform.data, reg_form.role_regform.data, reg_form.login_regform.data, _hashed_password)
-
     # Проверка на валидацию формы
     if reg_form.validate_on_submit():
 
@@ -200,12 +195,3 @@ def logout():
     flash("Вы вышли из аккаунта", "success")
 
     return redirect(url_for('index'))
-
-
-
-if basket_form.submit_add_basketform.data:
-    basket = []
-    basket_form_each = []
-    basket_form_each.append(basket_form.dish_basketform.data)
-    basket_form_each.append(basket_form.kol_basketform.data)
-    basket.append(basket_form_each)
