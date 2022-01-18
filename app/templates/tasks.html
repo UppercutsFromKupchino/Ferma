@@ -11,24 +11,7 @@
     </div>
     {% if session.get('role') == "manager" %}
         <a href="{{ url_for('task_adding') }}">Add task</a>
-        {% if table_info != None %}
-            <tbody>
-            {% for counter in range(table_info_len) %}
-            <tr>
-                <td>{{ table_info[counter][0] }}</td>
-                <td>{{ table_info[counter][1] }}</td>
-                <td>{{ table_info[counter][2] }}</td>
-                <td>{{ table_info[counter][3] }}</td>
-                <td>{{ table_info[counter][4] }}</td>
-                <td>{{ table_info[counter][5] }}</td>
-                <td>{{ table_info[counter][6] }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        {% endif %}
-    {% endif %}
-    {% if session['role'] == 'executor' %}
-        <table class="table table-hover table-info table-striped">
+        <table class="table table-hover table-executor table-striped">
             <thead>
                 <tr>
                     <th scope="col">Задание</th>
@@ -44,6 +27,28 @@
                     <td>{{ tasks_manager[i][1] }}</td>
                     <td>{{ tasks_manager[i][2] }}</td>
                     <td>{{ tasks_manager[i][3] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if session['role'] == 'executor' %}
+        <table class="table table-hover table-info table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Задание</th>
+                    <th scope="col">Комментарий</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Дата назначения</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for i in range(tasks_executor_i_len) %}
+                <tr>
+                    <td>{{ tasks_executor[i][0] }}</td>
+                    <td>{{ tasks_executor[i][1] }}</td>
+                    <td>{{ tasks_executor[i][2] }}</td>
+                    <td>{{ tasks_executor[i][3] }}</td>
                 </tr>
             {% endfor %}
             </tbody>

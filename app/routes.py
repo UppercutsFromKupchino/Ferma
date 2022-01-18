@@ -51,7 +51,8 @@ def index():
     if current_user.is_authenticated:
         login_user = session['login']
         print(session['login'])
-    return render_template("index.html", login_user=login_user)
+        return render_template("index.html", login_user=login_user)
+    return render_template("index.html")
 
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -110,7 +111,7 @@ def tasks():
         tasks_executor_i_len = len(tasks_executor)
         print(tasks_executor_i_len)
 
-        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len,tasks_executor=tasks_executor)
+        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor)
     elif session['role'] == 'manager':
         tasks_manager = dbase.get_tasks_manager()
         tasks_manager_i_len = len(tasks_manager)
@@ -145,37 +146,17 @@ def task_adding():
 
     # Добавляю задачу
     if request.method == 'POST':
-        # Получаю значение логина из формы
-        select_login = request.form['select-login']
-        select_login_value = executors_select_dict[int(select_login)]
-
-        # Получаю значение локации из формы
-        select_location = request.form['select-location']
-        select_location_value = locations_select_dict[int(select_location)]
-
-        # Получаю значение типа задачи из формы
-        select_typeoftask = request.form['select-typeoftask']
-        select_typeoftask_value = typeoftask_select_dict[int(select_typeoftask)]
-
-        # Получаю текст комментария
-        input_comment = request.form['input-comment']
-
-        # Получаю значение даты/времени
         # Получаю логин
         select_login = request.form['select-login']
         select_login_value = executors_select_dict[int(select_login)]
-
         # Получаю локацию
         select_location = request.form['select-location']
         select_location_value = locations_select_dict[int(select_location)]
-
         # Получаю тип задачи
         select_typeoftask = request.form['select-typeoftask']
         select_typeoftask_value = typeoftask_select_dict[int(select_typeoftask)]
-
         # Получаю время
         current_datetime_addingtask = datetime.datetime.now()
-
         # Получаю комментарий
         input_comment = request.form['comment-form']
 
@@ -184,8 +165,6 @@ def task_adding():
 
         # Взаимодействие с БД
         dbase.adding_task_form(select_login_value, adding_location_plus_typeoftask, select_location, select_typeoftask, current_datetime_addingtask, input_comment)
-        dbase.adding_task_form(select_login_value, adding_location_plus_typeoftask, select_location, select_typeoftask,
-                               current_datetime_addingtask, input_comment)
 
     return render_template("task_adding.html", executors_select_dict=executors_select_dict,
                            locations_select_dict=locations_select_dict, typeoftask_select_dict=typeoftask_select_dict)
