@@ -10,14 +10,15 @@
         <a href="{{ url_for('index') }}" class="redirect-tasks-home">Home page</a>
     </div>
     {% if session.get('role') == "manager" %}
-        <a href="{{ url_for('task_adding') }}">Add task</a>
-        <table class="table table-hover table-info table-striped">
+        <a href="{{ url_for('task_purpose_adding') }}">Add task</a>
+        <table class="table table-hover table-executor table-striped">
             <thead>
                 <tr>
                     <th scope="col">Задание</th>
                     <th scope="col">Комментарий</th>
                     <th scope="col">Статус</th>
                     <th scope="col">Логин работника</th>
+                    <th scope="col">Время добавления задачи</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,19 +28,22 @@
                     <td>{{ tasks_manager[i][1] }}</td>
                     <td>{{ tasks_manager[i][2] }}</td>
                     <td>{{ tasks_manager[i][3] }}</td>
+                    <td>{{ tasks_manager[i][4] }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     {% endif %}
-    {% if session.get('role') == "executor" %}
+    {% if session['role'] == 'executor' %}
+        {{ changing_form.hidden_tag() }}
         <table class="table table-hover table-info table-striped">
             <thead>
                 <tr>
                     <th scope="col">Задание</th>
                     <th scope="col">Комментарий</th>
                     <th scope="col">Статус</th>
-                    <th scope="col">Дата и время</th>
+                    <th scope="col">Дата назначения</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -53,6 +57,10 @@
             {% endfor %}
             </tbody>
         </table>
+        <form action="{{ url_for('tasks') }}" method="post">
+            {{ changing_form.hidden_tag() }}
+            {{ changing_form.submit_changingform(placeholder="Изменить статус задач") }}
+        </form>
     {% endif %}
 </body>
 </html>

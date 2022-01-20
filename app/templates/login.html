@@ -19,14 +19,14 @@
             <li>{{ message }}</li>
             {% endfor %}
         </ul>
-        {% endif %}
-        {% endwith %}
-        <form class="form-login" action="{{ url_for('login') }}" method="post">
-            {{ login_form.hidden_tag() }}
-            {{ login_form.login_loginform(placeholder="Login", class_="login-form-login") }}<br>
-            {{ login_form.password_loginform(placeholder="Password", class_="password-form-login") }}<br>
-            {{ login_form.submit_loginform(class_="submit-form-login") }}<br>
-        </form>
+    {% endif %}
+    {% endwith %}
+    <form class="form-login" action="{{ url_for('login') }}" method="post">
+        {{ login_form.hidden_tag() }}
+        {{ login_form.login_loginform(placeholder="Login",class_="login-form-login") }}<br>
+        {{ login_form.password_loginform(placeholder="Password",class_="password-form-login") }}<br>
+        {{ login_form.submit_loginform(class_="submit-form-login") }}
+    </form>
     </div>
     <a href="{{ url_for('register') }}" class="redirect-login-register">If you want to register, click here</a>
 </body>

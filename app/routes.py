@@ -11,10 +11,11 @@ from app.forms import LoginForm, RegisterForm
 import datetime
 
 
-# Login-manager
+# инициализация менеджера логинов
 login_manager = LoginManager(app)
 
 
+# Login-manager
 @login_manager.user_loader
 def load_user(user_id):
     return UserLogin().from_db(user_id, dbase)
@@ -31,14 +32,14 @@ def get_db():
         g.link_db = connect_db()
     return g.link_db
 
-
+# Создание объекта для работы с бд
 @app.before_request
 def before_request():
     db = get_db()
     global dbase
     dbase = DataBase(db)
 
-
+# Закрытие работы с базой данных
 @app.teardown_appcontext
 def close_db(error):
     if hasattr(g, 'link_db'):
@@ -49,24 +50,35 @@ def close_db(error):
 @app.route('/')
 def index():
     return render_template("index.html", login=login)
+    if current_user.is_authenticated:
+        login_user = session['login']
+        print(session['login'])
+        return render_template("index.html", login_user=login_user)
+    return render_template("index.html")
 
 
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     # Создание экземпляра класса LoginForm
     login_form = LoginForm()
-
     # Переадресация, если пользователь залогинен
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-
+    # Проверка валидации формы, введённой на сайте
     if login_form.validate_on_submit():
+        # Проверяю, существует ли в базе данных пользователь с логином, введённым в форме
         user = dbase.get_user(login_form.login_loginform.data)
+        # Проверка пароля; пароль хранится в виде хэша в целях безопасности
         if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
+            print("check zbs")
+            # Авторизация пользователя
             user_login = UserLogin().create(user)
             login_user(user_login)
             session['role'] = user['role_of_worker']
             session['login'] = user['login_of_worker']
+            session['role'] = user[1]
+            session['login'] = user[2]
+            print(session['login'])
 
             return redirect(url_for('index'))
 
@@ -76,11 +88,6 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     reg_form = RegisterForm()
-
-    # Проверка валидации формы
-    if reg_form.validate_on_submit():
-        _hashed_password = generate_password_hash(reg_form.password_regform.data)
-        dbase.add_user(reg_form.fio_regform.data, reg_form.role_regform.data, reg_form.login_regform.data, _hashed_password)
 
     # Проверка на валидацию формы
     if reg_form.validate_on_submit():
@@ -100,26 +107,26 @@ def register():
     return render_template('register.html', reg_form=reg_form)
 
 
-@app.route('/tasks')
+@app.route('/tasks', methods=['GET','POST'])
 @login_required
 def tasks():
     if session['role'] == 'executor':
         tasks_executor = dbase.get_tasks_executor(session['login'])
         tasks_executor_i_len = len(tasks_executor)
         print(tasks_executor_i_len)
+        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor)
 
-        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len,tasks_executor=tasks_executor)
     elif session['role'] == 'manager':
         tasks_manager = dbase.get_tasks_manager()
         tasks_manager_i_len = len(tasks_manager)
         print(tasks_manager_i_len)
-
+        print(tasks_manager)
         return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager)
 
 
 @app.route('/task_adding', methods=['GET', 'POST'])
 @login_required
-def task_adding():
+def task_purpose_adding():
     # Получаю всех работников с ролью "рабочий"
     executors_select = dbase.get_all_users()
     executors_select_len = len(executors_select)
@@ -146,18 +153,14 @@ def task_adding():
         # Получаю логин
         select_login = request.form['select-login']
         select_login_value = executors_select_dict[int(select_login)]
-
         # Получаю локацию
         select_location = request.form['select-location']
         select_location_value = locations_select_dict[int(select_location)]
-
         # Получаю тип задачи
         select_typeoftask = request.form['select-typeoftask']
         select_typeoftask_value = typeoftask_select_dict[int(select_typeoftask)]
-
         # Получаю время
         current_datetime_addingtask = datetime.datetime.now()
-
         # Получаю комментарий
         input_comment = request.form['comment-form']
 
@@ -165,8 +168,11 @@ def task_adding():
         adding_location_plus_typeoftask = select_typeoftask_value + " in " + select_location_value
 
         # Взаимодействие с БД
-        dbase.adding_task_form(select_login_value, adding_location_plus_typeoftask, select_location, select_typeoftask,
-                               current_datetime_addingtask, input_comment)
+        id_of_task = dbase.get_task_by_text(adding_location_plus_typeoftask)
+        if id_of_task is False:
+            dbase.add_task_form(adding_location_plus_typeoftask, select_location, select_typeoftask)
+        id_of_task = dbase.get_task_by_text(adding_location_plus_typeoftask)
+        dbase.add_purpose_comment_form(input_comment, current_datetime_addingtask, id_of_task, select_login_value)
 
     return render_template("task_adding.html", executors_select_dict=executors_select_dict,
                            locations_select_dict=locations_select_dict, typeoftask_select_dict=typeoftask_select_dict)

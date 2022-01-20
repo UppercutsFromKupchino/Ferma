@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="html">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
 </head>
 <body>
-    <h1>Register</h1>
+    <div class="cap_links">
+        <a href="{{ url_for('index') }}" class="redirect-reg-home">Home page</a>
+    </div>
     <form class="form-register" action="{{ url_for('register') }}" method="post">
+        <h3 class="h3-register">Register</h3><br>
         {{ reg_form.hidden_tag() }}
-        {{ reg_form.login_regform(size=20) }}{{ reg_form.login_regform.label() }}<br>
-        {{ reg_form.password_regform(size=20) }}{{ reg_form.password_regform.label }}<br>
-        {{ reg_form.fio_regform(size=20) }}{{ reg_form.fio_regform.label() }}<br>
-        {{ reg_form.role_regform(size=20) }}{{ reg_form.role_regform.label() }}<br>
-        {{ reg_form.fio_regform(size=20) }}{{ reg_form.fio_regform.label }}<br>
-        {{ reg_form.role_regform(size=20) }}{{ reg_form.role_regform.label }}<br>
-        {{ reg_form.submit_regform() }}
+        {{ reg_form.login_regform(placeholder="Login",class_="login-regform") }}<br>
+        {{ reg_form.password_regform(placeholder="Password",class_="password-regform") }}<br>
+        {{ reg_form.fio_regform(placeholder="FIO",class_="fio-regform") }}<br>
+        {{ reg_form.role_regform(placeholder="Role",class_="role-regform") }}<br>
+        {{ reg_form.submit_regform(placeholder="Register",class_="submit-regform") }}
     </form>
-    <a href="{{ url_for('login') }}">If you want to log in, click here</a>
+    <a href="{{ url_for('login') }}" class="redirect-reg-login">If you want to log in, click here</a>
 </body>
 </html>

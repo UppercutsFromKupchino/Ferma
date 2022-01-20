@@ -16,6 +16,7 @@
     </div>
     {% if current_user.is_authenticated %}
     <p class="paragraph-index">Hello</p>
+    <p class="paragraph-index">Hello, {{ login_user }}</p>
     {% else %}
     <p class="paragraph-index">You are not logged in!! This site contains private 18+ information, get the hell outta here if you don't work with us</p>
     {% endif %}
