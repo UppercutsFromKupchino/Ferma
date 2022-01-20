@@ -23,7 +23,7 @@ def load_user(user_id):
 
 # Подключение к СУБД через драйвер psycopg2
 def connect_db():
-    conn = psycopg2.connect(dbname="Kursach_Ferma", user="postgres", password="alp37327", host="localhost")
+    conn = psycopg2.connect(dbname="test", user="postgres", password="alp37327", host="localhost")
     return conn
 
 
@@ -49,7 +49,6 @@ def close_db(error):
 # Декораторы маршрутов
 @app.route('/')
 def index():
-    return render_template("index.html", login=login)
     if current_user.is_authenticated:
         login_user = session['login']
         print(session['login'])
@@ -70,15 +69,11 @@ def login():
         user = dbase.get_user(login_form.login_loginform.data)
         # Проверка пароля; пароль хранится в виде хэша в целях безопасности
         if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
-            print("check zbs")
             # Авторизация пользователя
             user_login = UserLogin().create(user)
             login_user(user_login)
-            session['role'] = user['role_of_worker']
+            session['role'] = user['name_of_role']
             session['login'] = user['login_of_worker']
-            session['role'] = user[1]
-            session['login'] = user[2]
-            print(session['login'])
 
             return redirect(url_for('index'))
 
@@ -113,14 +108,11 @@ def tasks():
     if session['role'] == 'executor':
         tasks_executor = dbase.get_tasks_executor(session['login'])
         tasks_executor_i_len = len(tasks_executor)
-        print(tasks_executor_i_len)
         return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor)
 
     elif session['role'] == 'manager':
         tasks_manager = dbase.get_tasks_manager()
         tasks_manager_i_len = len(tasks_manager)
-        print(tasks_manager_i_len)
-        print(tasks_manager)
         return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager)
 
 
