@@ -51,7 +51,6 @@ def close_db(error):
 def index():
     if current_user.is_authenticated:
         login_user = session['login']
-        print(session['login'])
         return render_template("index.html", login_user=login_user)
     return render_template("index.html")
 
