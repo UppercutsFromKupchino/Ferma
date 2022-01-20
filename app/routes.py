@@ -7,12 +7,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from app.UserLogin import UserLogin
 from app.DataBase import DataBase
-from app.forms import LoginForm, RegisterForm, ChangingStatusForm
+from app.forms import LoginForm, RegisterForm
 import datetime
 
 
 # инициализация менеджера логинов
 login_manager = LoginManager(app)
+
 
 # Login-manager
 @login_manager.user_loader
