@@ -1,5 +1,4 @@
 from app import app
-from flask import render_template, redirect, request, url_for, g, session
 from flask import render_template, redirect, request, url_for, g, flash, session
 import psycopg2
 import psycopg2.extras
@@ -32,12 +31,14 @@ def get_db():
         g.link_db = connect_db()
     return g.link_db
 
+
 # Создание объекта для работы с бд
 @app.before_request
 def before_request():
     db = get_db()
     global dbase
     dbase = DataBase(db)
+
 
 # Закрытие работы с базой данных
 @app.teardown_appcontext
@@ -174,5 +175,4 @@ def task_purpose_adding():
 def logout():
     logout_user()
     flash("Вы вышли из аккаунта", "success")
-
     return redirect(url_for('index'))
