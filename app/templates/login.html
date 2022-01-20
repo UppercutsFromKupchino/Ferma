@@ -10,15 +10,15 @@
         <a href="{{ url_for('index') }}" class="redirect-login-home">Home page</a>
     </div>
     <div class="center-div">
-        <h3 class="h3-sign-in">Sign In</h3>
-        <hr>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
+    <h3 class="h3-sign-in">Sign In</h3>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+     <ul>
+         {% for message in messages %}
+         <li>{{ message }}</li>
+         {% endfor %}
+     </ul>
     {% endif %}
     {% endwith %}
     <form class="form-login" action="{{ url_for('login') }}" method="post">

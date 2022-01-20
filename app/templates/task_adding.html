@@ -6,6 +6,15 @@
 </head>
 <body>
     <a href="{{ url_for('logout') }}">Logout</a>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+     <ul>
+         {% for message in messages %}
+         <li>{{ message }}</li>
+         {% endfor %}
+     </ul>
+    {% endif %}
+    {% endwith %}
     {% if session['role'] == "manager" %}
         <h3>Добавить задачу</h3>
         <form class="form-adding-task-manager" action="{{ url_for('task_purpose_adding') }}" method="post">

@@ -9,6 +9,15 @@
     <div class="cap_links">
         <a href="{{ url_for('index') }}" class="redirect-reg-home">Home page</a>
     </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+     <ul>
+         {% for message in messages %}
+         <li>{{ message }}</li>
+         {% endfor %}
+     </ul>
+    {% endif %}
+    {% endwith %}
     <form class="form-register" action="{{ url_for('register') }}" method="post">
         <h3 class="h3-register">Register</h3><br>
         {{ reg_form.hidden_tag() }}
