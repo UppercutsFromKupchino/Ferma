@@ -48,9 +48,6 @@ def close_db(error):
 # Декораторы маршрутов
 @app.route('/')
 def index():
-    if session['login']:
-        login = session['login']
-    print(session['role'])
     return render_template("index.html", login=login)
 
 
@@ -67,8 +64,7 @@ def login():
         user = dbase.get_user(login_form.login_loginform.data)
         if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
             user_login = UserLogin().create(user)
-            rm = True if login_form.remember_loginform.data else False
-            login_user(user_login, remember=rm)
+            login_user(user_login)
             session['role'] = user['role_of_worker']
             session['login'] = user['login_of_worker']
 
