@@ -78,7 +78,7 @@ class DataBase:
         self.__cursor.execute("""SELECT DISTINCT text_of_task,text_of_comment,name_of_status,purpose.login_of_worker,
         date_of_purpose FROM purpose JOIN status ON purpose.id_of_status=status.id_of_status 
         JOIN task ON purpose.id_of_task=task.id_of_task
-        JOIN comment_to_task ON purpose.id_of_task=comment_to_task.id_of_task""")
+        JOIN comment_to_task ON purpose.id_of_task=comment_to_task.id_of_task WHERE name_of_status != 'task finished'""")
         tasks_manager = self.__cursor.fetchall()
         return tasks_manager
 

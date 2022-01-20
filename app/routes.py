@@ -108,18 +108,16 @@ def register():
 @login_required
 def tasks():
     if session['role'] == 'executor':
-        changing_form = ChangingStatusForm()
         tasks_executor = dbase.get_tasks_executor(session['login'])
         tasks_executor_i_len = len(tasks_executor)
         print(tasks_executor_i_len)
-        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor,
-                               changing_form=changing_form)
+        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor)
+
     elif session['role'] == 'manager':
         tasks_manager = dbase.get_tasks_manager()
         tasks_manager_i_len = len(tasks_manager)
         print(tasks_manager_i_len)
         print(tasks_manager)
-
         return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager)
 
 
