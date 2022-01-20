@@ -8,7 +8,7 @@
     <a href="{{ url_for('logout') }}">Logout</a>
     {% if session['role'] == "manager" %}
         <h3>Добавить задачу</h3>
-        <form class="form-adding-task-manager" action="{{ url_for('task_adding') }}" method="post">
+        <form class="form-adding-task-manager" action="{{ url_for('task_purpose_adding') }}" method="post">
             <div>
                 <p>Выберите логин</p>
                 <select name="select-login">

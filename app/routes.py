@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from app.UserLogin import UserLogin
 from app.DataBase import DataBase
-from app.forms import LoginForm, RegisterForm
+from app.forms import LoginForm, RegisterForm, ChangingStatusForm
 import datetime
 
 
@@ -55,7 +55,7 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     # Создание экземпляра класса LoginForm
     login_form = LoginForm()
@@ -66,9 +66,9 @@ def login():
     if login_form.validate_on_submit():
         # Проверяю, существует ли в базе данных пользователь с логином, введённым в форме
         user = dbase.get_user(login_form.login_loginform.data)
-        print(user)
         # Проверка пароля; пароль хранится в виде хэша в целях безопасности
         if user and check_password_hash(user['password_of_worker'], login_form.password_loginform.data):
+            print("check zbs")
             # Авторизация пользователя
             user_login = UserLogin().create(user)
             login_user(user_login)
@@ -103,26 +103,28 @@ def register():
     return render_template('register.html', reg_form=reg_form)
 
 
-@app.route('/tasks')
+@app.route('/tasks', methods=['GET','POST'])
 @login_required
 def tasks():
     if session['role'] == 'executor':
+        changing_form = ChangingStatusForm()
         tasks_executor = dbase.get_tasks_executor(session['login'])
         tasks_executor_i_len = len(tasks_executor)
         print(tasks_executor_i_len)
-
-        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor)
+        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor,
+                               changing_form=changing_form)
     elif session['role'] == 'manager':
         tasks_manager = dbase.get_tasks_manager()
         tasks_manager_i_len = len(tasks_manager)
         print(tasks_manager_i_len)
+        print(tasks_manager)
 
         return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager)
 
 
 @app.route('/task_adding', methods=['GET', 'POST'])
 @login_required
-def task_adding():
+def task_purpose_adding():
     # Получаю всех работников с ролью "рабочий"
     executors_select = dbase.get_all_users()
     executors_select_len = len(executors_select)
@@ -164,7 +166,11 @@ def task_adding():
         adding_location_plus_typeoftask = select_typeoftask_value + " in " + select_location_value
 
         # Взаимодействие с БД
-        dbase.adding_task_form(select_login_value, adding_location_plus_typeoftask, select_location, select_typeoftask, current_datetime_addingtask, input_comment)
+        id_of_task = dbase.get_task_by_text(adding_location_plus_typeoftask)
+        if id_of_task is False:
+            dbase.add_task_form(adding_location_plus_typeoftask, select_location, select_typeoftask)
+        id_of_task = dbase.get_task_by_text(adding_location_plus_typeoftask)
+        dbase.add_purpose_comment_form(input_comment, current_datetime_addingtask, id_of_task, select_login_value)
 
     return render_template("task_adding.html", executors_select_dict=executors_select_dict,
                            locations_select_dict=locations_select_dict, typeoftask_select_dict=typeoftask_select_dict)

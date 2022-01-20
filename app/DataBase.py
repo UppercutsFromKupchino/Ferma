@@ -50,47 +50,43 @@ class DataBase:
         types_of_task = self.__cursor.fetchall()
         return types_of_task
 
-    def adding_task_form(self, login, text, location, typeoftask, datetime, comment):
-        try:
-            # Добавляю в таблицу task
-            self.__cursor.execute(
-                "INSERT INTO task(text_of_task,id_of_location,id_of_type,id_of_status) VALUES(%s,%s,%s,'1')",
-                (text, location, typeoftask))
-            self.__db.commit()
+    def get_task_by_text(self, text):
+        self.__cursor.execute("""SELECT id_of_task FROM task WHERE text_of_task = %s""", (text,))
+        id_of_task = self.__cursor.fetchone()
+        if id_of_task is None:
+            return False
+        return id_of_task
 
-            # Ищу максимальное значение id в таблице task
-            self.__cursor.execute("SELECT MAX(id_of_task) FROM task")
-            max_id_of_task = self.__cursor.fetchone()
-            if not max_id_of_task:
-                max_id_of_task = 1
+    def add_task_form(self, text, location, typeoftask):
+        # Добавляю в таблицу task
+        self.__cursor.execute("INSERT INTO task(text_of_task,id_of_location,id_of_type) VALUES(%s,%s,%s)",
+                              (text, location, typeoftask))
+        self.__db.commit()
 
-            # Добавляю в таблицу purpose
-            self.__cursor.execute("INSERT INTO purpose VALUES (%s,%s,%s)", (datetime, max_id_of_task, login))
-            self.__db.commit()
+    def add_purpose_comment_form(self, comment, datetime, id_of_task, login):
+        # Добавляю в таблицу purpose
+        self.__cursor.execute("INSERT INTO purpose VALUES (%s,%s,%s,'1')", (datetime, id_of_task, login))
+        self.__db.commit()
 
-            # Добавляю в таблицу comment
-            self.__cursor.execute(
-                "INSERT INTO comment_to_task(text_of_comment,datetime_of_comment,id_of_task,login_of_worker) VALUES (%s,%s,%s,%s)",
-                (comment, datetime, max_id_of_task, login))
-            self.__db.commit()
-        except:
-            self.__db.rollback()
+        # Добавляю в таблицу comment
+        self.__cursor.execute("""INSERT INTO comment_to_task(text_of_comment,datetime_of_comment,id_of_task,
+        login_of_worker) VALUES (%s,%s,%s,%s)""", (comment, datetime, id_of_task, login))
+        self.__db.commit()
 
     def get_tasks_manager(self):
         self.__cursor = self.__db.cursor()
-        self.__cursor.execute("""SELECT text_of_task,text_of_comment,name_of_status,purpose.login_of_worker
-        FROM task JOIN status ON task.id_of_status=status.id_of_status 
-        JOIN comment_to_task ON task.id_of_task=comment_to_task.id_of_task
-		JOIN purpose ON task.id_of_task=purpose.id_of_task""")
+        self.__cursor.execute("""SELECT DISTINCT text_of_task,text_of_comment,name_of_status,purpose.login_of_worker,
+        date_of_purpose FROM purpose JOIN status ON purpose.id_of_status=status.id_of_status 
+        JOIN task ON purpose.id_of_task=task.id_of_task
+        JOIN comment_to_task ON purpose.id_of_task=comment_to_task.id_of_task""")
         tasks_manager = self.__cursor.fetchall()
         return tasks_manager
 
     def get_tasks_executor(self, login):
         self.__cursor = self.__db.cursor()
-        self.__cursor.execute("""SELECT text_of_task,text_of_comment,name_of_status,datetime_of_purpose FROM task
-                                JOIN comment_to_task ON task.id_of_task=comment_to_task.id_of_task
-                                JOIN status ON task.id_of_status=status.id_of_status
-                                JOIN purpose ON task.id_of_task=purpose.id_of_task WHERE purpose.login_of_worker = %s""",
-                              (login,))
+        self.__cursor.execute("""SELECT DISTINCT text_of_task,text_of_comment,name_of_status,date_of_purpose
+        FROM purpose JOIN comment_to_task ON purpose.id_of_task=comment_to_task.id_of_task
+        JOIN task ON task.id_of_task=purpose.id_of_task
+        JOIN status ON purpose.id_of_status=status.id_of_status WHERE purpose.login_of_worker = %s""", (login,))
         tasks_executor = self.__cursor.fetchall()
         return tasks_executor
