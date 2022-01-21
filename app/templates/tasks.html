@@ -28,6 +28,8 @@
                     <th scope="col">Статус</th>
                     <th scope="col">Логин работника</th>
                     <th scope="col">Время добавления задачи</th>
+                    <th scope="col">Айди назначения</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +40,13 @@
                     <td>{{ tasks_manager[i][2] }}</td>
                     <td>{{ tasks_manager[i][3] }}</td>
                     <td>{{ tasks_manager[i][4] }}</td>
+                    <td>{{ tasks_manager[i][5] }}</td>
+                    <td>
+                        <form action="{{ url_for('tasks') }}" method="post">
+                            {{ changing_form.submit_changing_hidden(value=tasks_manager[i][5]) }}
+                            {{ changing_form.submit_changing() }}
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -50,8 +59,9 @@
                 <tr>
                     <th scope="col">Задание</th>
                     <th scope="col">Комментарий</th>
-                    <th scope="col">Статус</th>
                     <th scope="col">Дата назначения</th>
+                    <th scope="col">Изменение статуса</th>
+                    <th scope="col">Текущий статус</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -60,16 +70,29 @@
                 <tr>
                     <td>{{ tasks_executor[i][0] }}</td>
                     <td>{{ tasks_executor[i][1] }}</td>
+                    <td>{{ tasks_executor[i][4] }}</td>
                     <td>{{ tasks_executor[i][2] }}</td>
-                    <td>{{ tasks_executor[i][3] }}</td>
+                    <form action="{{ url_for('tasks') }}" method="post">
+                        <td>
+                        {{ changing_form.select_status() }}
+                        </td>
+                        <td>
+                        {{ changing_form.changing_status(value=tasks_executor[i][5]) }}
+                        {{ changing_form.changing_submit() }}
+                        </td>
+                    </form>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-        <form action="{{ url_for('tasks') }}" method="post">
-            {{ changing_form.hidden_tag() }}
-            {{ changing_form.submit_changingform(placeholder="Изменить статус задач") }}
-        </form>
     {% endif %}
 </body>
 </html>
+
+{#<form name="select-status" action="{{ url_for('tasks') }}" method="post">#}
+{#                            <select>#}
+{#                                <option value="{{ tasks_executor[i][3] }}">{{ tasks_executor[i][2] }}</option>#}
+{#                                <option value="{{ tasks_executor_list[i][0][0] }}">{{ tasks_executor_list[i][0][1] }}</option>#}
+{#                                <option value="{{ tasks_executor_list[i][1][0] }}">{{ tasks_executor_list[i][1][1] }}</option>#}
+{#                            </select>#}
+{#                        </form>#}

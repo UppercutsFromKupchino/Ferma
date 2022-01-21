@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from app.UserLogin import UserLogin
 from app.DataBase import DataBase
-from app.forms import LoginForm, RegisterForm
+from app.forms import LoginForm, RegisterForm, ChangingForm, ChangingFormExecutor
 import datetime
 
 
@@ -83,7 +83,8 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     reg_form = RegisterForm()
-
+    # roles = dbase.get_all_roles()
+    # reg_form.role_regform.choices.
     # Проверка на валидацию формы
     if reg_form.validate_on_submit():
 
@@ -102,18 +103,46 @@ def register():
     return render_template('register.html', reg_form=reg_form)
 
 
-@app.route('/tasks', methods=['GET','POST'])
+@app.route('/tasks', methods=['GET', 'POST'])
 @login_required
 def tasks():
     if session['role'] == 'executor':
+        changing_form = ChangingFormExecutor()
+
+        # Достаю все задачи для залогиненного работника
         tasks_executor = dbase.get_tasks_executor(session['login'])
         tasks_executor_i_len = len(tasks_executor)
-        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor)
+
+        # Список статусов, которые не входят в статус назначения
+        tasks_executor_list = []
+        for i in range(tasks_executor_i_len):
+            id_name = dbase.get_statuses(tasks_executor[i][3])
+            tasks_executor_list.append(id_name)
+        tasks_executor_len = len(tasks_executor_list[0])
+        print(tasks_executor_list)
+        print(tasks_executor)
+
+        changing_form.select_status.choices = dbase.get_all_statuses()
+        print(changing_form.select_status.choices)
+
+        # Нажата кнопка
+        if changing_form.changing_submit.data:
+            print(changing_form.select_status.data)
+            dbase.update_status(changing_form.select_status.data, changing_form.changing_status.data)
+            return redirect(url_for('tasks'))
+        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor,
+                               tasks_executor_list=tasks_executor_list, tasks_executor_len=tasks_executor_len,
+                               changing_form=changing_form)
 
     elif session['role'] == 'manager':
+        changing_form = ChangingForm()
         tasks_manager = dbase.get_tasks_manager()
         tasks_manager_i_len = len(tasks_manager)
-        return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager)
+        if changing_form.submit_changing.data:
+            dbase.delete_purpose(changing_form.submit_changing_hidden.data)
+            return redirect(url_for('tasks'))
+        return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager,
+                               changing_form=changing_form)
 
 
 @app.route('/task_adding', methods=['GET', 'POST'])
@@ -164,7 +193,8 @@ def task_purpose_adding():
         if id_of_task is False:
             dbase.add_task_form(adding_location_plus_typeoftask, select_location, select_typeoftask)
         id_of_task = dbase.get_task_by_text(adding_location_plus_typeoftask)
-        dbase.add_purpose_comment_form(input_comment, current_datetime_addingtask, id_of_task, select_login_value)
+        dbase.add_purpose_comment_form(input_comment, current_datetime_addingtask, id_of_task[0], select_login_value)
+        return redirect(url_for('tasks'))
 
     return render_template("task_adding.html", executors_select_dict=executors_select_dict,
                            locations_select_dict=locations_select_dict, typeoftask_select_dict=typeoftask_select_dict)
