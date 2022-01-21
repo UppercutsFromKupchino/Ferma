@@ -56,7 +56,7 @@ def index():
     if current_user.is_authenticated:
         login_user = session['login']
         return render_template("index.html", login_user=login_user)
-    return render_template("test.html")
+    return render_template("index.html")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -80,7 +80,7 @@ def login():
 
             return redirect(url_for('index'))
 
-    return render_template('test.html', login_form=login_form)
+    return render_template('login.html', login_form=login_form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -103,39 +103,37 @@ def register():
 
             return redirect(url_for('index'))
 
-    return render_template('test.html', reg_form=reg_form)
+    return render_template('register.html', reg_form=reg_form)
 
 
 @app.route('/tasks', methods=['GET', 'POST'])
 @login_required
 def tasks():
     if session['role'] == 'executor':
-        changing_form = ChangingFormExecutor()
-
         # Достаю все задачи для залогиненного работника
         tasks_executor = dbase.get_tasks_executor(session['login'])
-        tasks_executor_i_len = len(tasks_executor)
+        if tasks_executor:
+            tasks_executor_exists = True
+            changing_form = ChangingFormExecutor()
 
-        # Список статусов, которые не входят в статус назначения
-        tasks_executor_list = []
-        for i in range(tasks_executor_i_len):
-            id_name = dbase.get_statuses(tasks_executor[i][3])
-            tasks_executor_list.append(id_name)
-        tasks_executor_len = len(tasks_executor_list[0])
-        print(tasks_executor_list)
-        print(tasks_executor)
+            tasks_executor_i_len = len(tasks_executor)
+            # Список статусов, которые не входят в статус назначения
+            tasks_executor_list = []
+            for i in range(tasks_executor_i_len):
+                id_name = dbase.get_statuses(tasks_executor[i][3])
+                tasks_executor_list.append(id_name)
 
-        changing_form.select_status.choices = dbase.get_all_statuses()
-        print(changing_form.select_status.choices)
+            changing_form.select_status.choices = dbase.get_all_statuses()
 
-        # Нажата кнопка
-        if changing_form.changing_submit.data:
-            print(changing_form.select_status.data)
-            dbase.update_status(changing_form.select_status.data, changing_form.changing_status.data)
-            return redirect(url_for('tasks'))
-        return render_template("test.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor,
-                               tasks_executor_list=tasks_executor_list, tasks_executor_len=tasks_executor_len,
-                               changing_form=changing_form)
+            # Нажата кнопка
+            if changing_form.changing_submit.data:
+                dbase.update_status(changing_form.select_status.data, changing_form.changing_status.data)
+                return redirect(url_for('tasks'))
+            return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len,
+                                   tasks_executor=tasks_executor, tasks_executor_list=tasks_executor_list,
+                                   changing_form=changing_form, tasks_executor_exists=tasks_executor_exists)
+        else:
+            return render_template("tasks.html")
 
     elif session['role'] == 'manager':
         changing_form = ChangingForm()
@@ -144,7 +142,7 @@ def tasks():
         if changing_form.submit_changing.data:
             dbase.delete_purpose(changing_form.submit_changing_hidden.data)
             return redirect(url_for('tasks'))
-        return render_template("test.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager,
+        return render_template("tasks.html", tasks_manager_i_len=tasks_manager_i_len, tasks_manager=tasks_manager,
                                changing_form=changing_form)
 
 
@@ -199,7 +197,7 @@ def task_purpose_adding():
         dbase.add_purpose_comment_form(input_comment, current_datetime_addingtask, id_of_task[0], select_login_value)
         return redirect(url_for('tasks'))
 
-    return render_template("test.html", executors_select_dict=executors_select_dict,
+    return render_template("task_adding.html", executors_select_dict=executors_select_dict,
                            locations_select_dict=locations_select_dict, typeoftask_select_dict=typeoftask_select_dict)
 
 

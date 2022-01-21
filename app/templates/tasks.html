@@ -53,6 +53,7 @@
         </table>
     {% endif %}
     {% if session['role'] == 'executor' %}
+        {% if tasks_executor_exists %}
         {{ changing_form.hidden_tag() }}
         <table class="table table-hover table-info table-striped">
             <thead>
@@ -85,6 +86,9 @@
             {% endfor %}
             </tbody>
         </table>
+        {% else %}
+        <p>{{ session['login'] }}, для вас задач пока нет</p>
+        {% endif %}
     {% endif %}
 </body>
 </html>
