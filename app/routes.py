@@ -22,7 +22,10 @@ def load_user(user_id):
 
 # Подключение к СУБД через драйвер psycopg2
 def connect_db():
-    conn = psycopg2.connect(dbname="test", user="postgres", password="alp37327", host="localhost")
+    conn = psycopg2.connect(dbname="d5ic8hs0fld8tm",
+                            user="vmsrmzcsmwxivk",
+                            password="abbc3bd7d67af4232519f5dd5aaded2447bca7f8d8c97be6a0e4eb55b88bdfcb",
+                            host="ec2-63-32-7-190.eu-west-1.compute.amazonaws.com")
     return conn
 
 
