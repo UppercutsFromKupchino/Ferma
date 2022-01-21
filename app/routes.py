@@ -110,32 +110,30 @@ def register():
 @login_required
 def tasks():
     if session['role'] == 'executor':
-        changing_form = ChangingFormExecutor()
-
         # Достаю все задачи для залогиненного работника
         tasks_executor = dbase.get_tasks_executor(session['login'])
-        tasks_executor_i_len = len(tasks_executor)
+        if tasks_executor:
+            tasks_executor_exists = True
+            changing_form = ChangingFormExecutor()
 
-        # Список статусов, которые не входят в статус назначения
-        tasks_executor_list = []
-        for i in range(tasks_executor_i_len):
-            id_name = dbase.get_statuses(tasks_executor[i][3])
-            tasks_executor_list.append(id_name)
-        tasks_executor_len = len(tasks_executor_list[0])
-        print(tasks_executor_list)
-        print(tasks_executor)
+            tasks_executor_i_len = len(tasks_executor)
+            # Список статусов, которые не входят в статус назначения
+            tasks_executor_list = []
+            for i in range(tasks_executor_i_len):
+                id_name = dbase.get_statuses(tasks_executor[i][3])
+                tasks_executor_list.append(id_name)
 
-        changing_form.select_status.choices = dbase.get_all_statuses()
-        print(changing_form.select_status.choices)
+            changing_form.select_status.choices = dbase.get_all_statuses()
 
-        # Нажата кнопка
-        if changing_form.changing_submit.data:
-            print(changing_form.select_status.data)
-            dbase.update_status(changing_form.select_status.data, changing_form.changing_status.data)
-            return redirect(url_for('tasks'))
-        return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len, tasks_executor=tasks_executor,
-                               tasks_executor_list=tasks_executor_list, tasks_executor_len=tasks_executor_len,
-                               changing_form=changing_form)
+            # Нажата кнопка
+            if changing_form.changing_submit.data:
+                dbase.update_status(changing_form.select_status.data, changing_form.changing_status.data)
+                return redirect(url_for('tasks'))
+            return render_template("tasks.html", tasks_executor_i_len=tasks_executor_i_len,
+                                   tasks_executor=tasks_executor, tasks_executor_list=tasks_executor_list,
+                                   changing_form=changing_form, tasks_executor_exists=tasks_executor_exists)
+        else:
+            return render_template("tasks.html")
 
     elif session['role'] == 'manager':
         changing_form = ChangingForm()

@@ -53,6 +53,7 @@
         </table>
     {% endif %}
     {% if session['role'] == 'executor' %}
+        {% if tasks_executor_exists %}
         {{ changing_form.hidden_tag() }}
         <table class="table table-hover table-info table-striped">
             <thead>
@@ -85,14 +86,9 @@
             {% endfor %}
             </tbody>
         </table>
+        {% else %}
+        <p>{{ session['login'] }}, для вас задач пока нет</p>
+        {% endif %}
     {% endif %}
 </body>
 </html>
-
-{#<form name="select-status" action="{{ url_for('tasks') }}" method="post">#}
-{#                            <select>#}
-{#                                <option value="{{ tasks_executor[i][3] }}">{{ tasks_executor[i][2] }}</option>#}
-{#                                <option value="{{ tasks_executor_list[i][0][0] }}">{{ tasks_executor_list[i][0][1] }}</option>#}
-{#                                <option value="{{ tasks_executor_list[i][1][0] }}">{{ tasks_executor_list[i][1][1] }}</option>#}
-{#                            </select>#}
-{#                        </form>#}
